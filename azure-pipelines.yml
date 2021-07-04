@@ -37,7 +37,7 @@ stages:
     - task: Maven@3
       displayName: 'Maven Package'
       inputs:
-        mavenPomFile: 'react-and-spring-data-rest/pom.xml/pom.xml'
+        mavenPomFile: 'react-and-spring-data-rest/pom.xml'
 
     - task: CopyFiles@2
       displayName: 'Copy Files to artifact staging directory'
