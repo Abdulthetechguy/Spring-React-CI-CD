@@ -33,6 +33,6 @@ steps:
     displayName: Push Docker image
     inputs:
       containerRegistry: 'dockerconnect'
-      repository: 'spring-boot-example'
+      repository: 'capehakeemww0azacr'
       command: 'push'
       tags: 'latest'
