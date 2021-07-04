@@ -2,21 +2,57 @@
 # Build your Java project and run tests with Apache Maven.
 # Add steps that analyze code, save build artifacts, deploy, and more:
 # https://docs.microsoft.com/azure/devops/pipelines/languages/java
-
 trigger:
-- main
+  branches:
+    include: 
+    - main
 
-pool:
-  vmImage: ubuntu-latest
+variables:
+  buildConfiguration: 'Release'
+  location: 'West US 2'
+  acrHostName: 'capehakeemww0azacr.azurecr.io'
+  acrName: 'capehakeemww0azacr'
+  rgName: 'cape-rg'
+  imageName: 'capehakeewmdocker'
+  webAppName: 'capedocker'
+  subscription: 'CAPESPN'
+stages:
 
-steps:
-- task: Maven@3
-  inputs:
-    mavenPomFile: 'react-and-spring-data-rest/pom.xml'
-    mavenOptions: '-Xmx3072m'
-    javaHomeOption: 'JDKVersion'
-    jdkVersionOption: '1.8'
-    jdkArchitectureOption: 'x64'
-    publishJUnitResults: true
-    testResultsFiles: '**/surefire-reports/TEST-*.xml'
-    goals: 'package'
+# Build Stage
+- stage: BuildAndTest
+  jobs:
+  - job: BuildAndTest
+    pool:
+      vmImage: 'Ubuntu-latest'
+    steps:
+    # Create or update the ACR resource
+    - task: AzureResourceGroupDeployment@2
+      displayName: 'Azure Deployment:Create Azure Container Registry'
+      inputs:
+        azureSubscription: '$(subscription)'
+        resourceGroupName: '$(rgName)'
+        location: $(location)
+        csmFile: '$(System.DefaultWorkingDirectory)/**/containerRegistry-template.json'
+        overrideParameters: '-registryName "$(acrName)" -registryLocation "$(location)" -registrySku standard'
+    - task: Maven@3
+      inputs:
+        mavenPomFile: 'react-and-spring-data-rest/pom.xml'
+        mavenOptions: '-Xmx3072m'
+        javaHomeOption: 'JDKVersion'
+        jdkVersionOption: '1.8'
+        jdkArchitectureOption: 'x64'
+        publishJUnitResults: true
+        testResultsFiles: '**/surefire-reports/TEST-*.xml'
+        goals: 'package'
+    - task: Docker@2
+      displayName: Login to ACR
+      inputs:
+        command: login
+        containerRegistry: '$(subscription)'
+
+    - task: Docker@2
+      displayName: Build and Push
+      inputs:
+        command: buildAndPush
+        repository: '($acrName)'
+        tags: latest    
