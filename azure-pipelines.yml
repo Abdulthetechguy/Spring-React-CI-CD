@@ -9,7 +9,7 @@ steps:
   displayName: Login to ACR
   inputs:
     command: login
-    containerRegistry: dockerconnect
+    containerRegistry: test
 - task: Maven@3
   inputs:
     mavenPomFile: 'react-and-spring-data-rest/pom.xml'
