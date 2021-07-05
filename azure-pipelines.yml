@@ -7,6 +7,7 @@ variables:
   location: 'West US'
   acrHostName: 'ananapi.azurecr.io'
   acrName: 'ananapi'
+  acrName1: 'ananap2i'
   rgName: 'registry'
   imageName: 'dockerdemo'
   webAppName: 'capedocker'
@@ -34,7 +35,7 @@ stages:
         resourceGroupName: '$(rgName)'
         location: $(location)
         csmFile: '$(System.DefaultWorkingDirectory)/**/containerRegistry-template.json'
-        overrideParameters: '-registryName "$(acrName)" -registryLocation "$(location)" -registrySku standard'
+        overrideParameters: '-registryName "$(acrName1)" -registryLocation "$(location)" -registrySku standard'
 
 # Create MySQL Database
     - task: AzureResourceGroupDeployment@2
