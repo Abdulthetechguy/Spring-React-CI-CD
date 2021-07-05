@@ -6,7 +6,7 @@ variables:
   buildConfiguration: 'Release'
   location: 'West US 2'
   acrHostName: 'ananapi.azurecr.io'
-  acrName: 'anan'
+  acrName: 'ananapi'
   rgName: 'registry'
   imageName: 'dockerdemo'
   webAppName: 'capedocker'
