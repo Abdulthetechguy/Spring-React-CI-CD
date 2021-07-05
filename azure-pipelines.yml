@@ -27,16 +27,16 @@ stages:
     steps:
 
 
-# Create or update the ACR resource
-    - task: AzureResourceGroupDeployment@2
-      displayName: 'Azure Deployment:Create Azure Container Registry'
-      inputs:
-        azureSubscription: '$(subscription)'
-        resourceGroupName: '$(rgName)'
-        location: $(location)
-        deploymentMode: Validation
-        csmFile: '$(System.DefaultWorkingDirectory)/**/containerRegistry-template.json'
-        overrideParameters: '-registryName "$(acrName1)" -registryLocation "$(location)" -registrySku standard'
+# # Create or update the ACR resource
+#     - task: AzureResourceGroupDeployment@2
+#       displayName: 'Azure Deployment:Create Azure Container Registry'
+#       inputs:
+#         azureSubscription: '$(subscription)'
+#         resourceGroupName: '$(rgName)'
+#         location: $(location)
+#         deploymentMode: Validation
+#         csmFile: '$(System.DefaultWorkingDirectory)/**/containerRegistry-template.json'
+#         overrideParameters: '-registryName "$(acrName1)" -registryLocation "$(location)" -registrySku standard'
 
 # Create MySQL Database
     - task: AzureResourceGroupDeployment@2
