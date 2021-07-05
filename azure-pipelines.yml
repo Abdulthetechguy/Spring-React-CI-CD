@@ -34,6 +34,7 @@ stages:
         azureSubscription: '$(subscription)'
         resourceGroupName: '$(rgName)'
         location: $(location)
+        deploymentMode: Validation
         csmFile: '$(System.DefaultWorkingDirectory)/**/containerRegistry-template.json'
         overrideParameters: '-registryName "$(acrName1)" -registryLocation "$(location)" -registrySku standard'
 
