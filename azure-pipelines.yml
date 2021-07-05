@@ -1,6 +1,17 @@
 trigger:
 - master
 
+variables:
+  buildConfiguration: 'Release'
+  location: 'West US 2'
+  acrHostName: 'ananapi.azurecr.io'
+  acrName: 'anan'
+  rgName: 'registry'
+  imageName: 'dockerdemo'
+  webAppName: 'capedocker'
+  subscription: 'CAPESPN'
+  regconnect: 'test'
+
 pool:
   vmImage: 'ubuntu-latest'
 
@@ -9,7 +20,7 @@ steps:
   displayName: Login to ACR
   inputs:
     command: login
-    containerRegistry: test
+    containerRegistry: '$(regconnect)'
 - task: Maven@3
   inputs:
     mavenPomFile: 'react-and-spring-data-rest/pom.xml'
@@ -24,5 +35,5 @@ steps:
   displayName: Build and Push
   inputs:
     command: buildAndPush
-    repository: spring-demo
-    tags: latest
+    repository: '$(imageName)'
+    tags: '$(Build.BuildId)'
