@@ -2,20 +2,23 @@ trigger:
   branches:
     include: 
     - master
+
+pool:
+  vmImage: 'ubuntu-latest'
+
 variables:
-  buildConfiguration: 'Release'
-  location: 'West US'
-  acrHostName: 'ananapi.azurecr.io'
-  acrName: 'ananapi'
-  acrName1: 'ananap2i'
-  rgName: 'registry'
-  imageName: 'dockerdemo'
-  webAppName: 'capedocker'
   subscription: 'ADOSC'
+  rgname: 'newtest'
+  app.name: 'myappxd21'
+  appservice.plan: 'myappserviceplanw231'
+  mysql.db.name: springdb
+  mysql.db.server: mysqlv3221
+  mysql.db.username: 'root'
+  location: 'west us'
+  acr.name: 'ananapi'
+  registry.username: 'ananapi'
   regconnect: 'test'
 
-  # webAppNamestg: 'capedockerstg'
-  # webAppNameprd: 'capedockerprd'
 stages:
 
 # Build Stage
@@ -26,28 +29,15 @@ stages:
       vmImage: 'Ubuntu-latest'
     steps:
 
-
-# # Create or update the ACR resource
-#     - task: AzureResourceGroupDeployment@2
-#       displayName: 'Azure Deployment:Create Azure Container Registry'
-#       inputs:
-#         azureSubscription: '$(subscription)'
-#         resourceGroupName: '$(rgName)'
-#         location: $(location)
-#         deploymentMode: Validation
-#         csmFile: '$(System.DefaultWorkingDirectory)/**/containerRegistry-template.json'
-#         overrideParameters: '-registryName "$(acrName1)" -registryLocation "$(location)" -registrySku standard'
-
 # Create MySQL Database
     - task: AzureResourceGroupDeployment@2
-      displayName: 'Azure Deployment:Create Azure Container Registry'
+      displayName: 'Azure Deployment:Create MySql Database'
       inputs:
         azureSubscription: '$(subscription)'
         resourceGroupName: '$(rgName)'
         location: $(location)
         csmFile: '$(System.DefaultWorkingDirectory)/**/database-webapp-template.json'
         
-
 #Login to ACR
     - task: Docker@2
       displayName: Login to ACR
@@ -75,134 +65,24 @@ stages:
         repository: cape-demo
         tags: latest
 
- # Copy ARM templates
-    - task: CopyFiles@2
-      displayName: 'Copy ARM templates'
-      inputs:
-        SourceFolder: ArmTemplates
-        TargetFolder: '$(build.artifactstagingdirectory)'
 
-    # Publish the app as an artifact
-    - publish: $(Build.StagingDirectory)
-      artifact: app
-
-
-# Dev release
-- stage: DEV_Stage
+- stage: Deployment 
   jobs:
-  - job: Release
-    pool:
-      vmImage: 'Ubuntu-latest'
+  - job: DeployService
+    displayName: 'Update webapp'
     steps:
-    # Don't clone the repo
-    - checkout: none
-
-    # Download the published application artifact
-    - download: current
-      artifact: app
-
-    # Create or update Azure App Service
-    - task: AzureResourceGroupDeployment@2
-      displayName: 'Azure Deployment:Create Azure App Service'
-      inputs:
-        azureSubscription: '$(subscription)'
-        resourceGroupName: '$(rgName)'
-        location: '$(location)'
-        csmFile: '$(Pipeline.Workspace)/**/container-webapp-template.json'
-        overrideParameters: '-webAppName "$(webAppName)-dev" -hostingPlanName $(webAppName) -appInsightsLocation "$(location)" -sku "S1 Standard" -registryName $(acrName) -registryLocation "$(location)" -registrySku standard -imageName $(imageName):$(Build.BuildId)'
-
-    # Deploy App Service
-    - task: AzureRmWebAppDeployment@3
-      displayName: 'Deploy Azure App Service'
-      inputs:
-        azureSubscription: '$(subscription)'
-        appType: applinux
-        WebAppName: "$(webAppName)-dev"
-        DockerNamespace: $(acrHostName)
-        DockerRepository: $(webAppName)
-        DockerImageTag: '$(Build.BuildId)'
-        WebAppUri: webAppUrl
-        TakeAppOfflineFlag: true
-        UseWebDeploy: true
-        RenameFilesFlag: true
-
-# #Staging release
-# - stage: STG_Release
-#   jobs:
-#   - job: Release
-#     pool:
-#       vmImage: 'Ubuntu-latest'
-#     steps:
-#     # Don't clone the repo
-#     - checkout: none
-
-#     # Download the published application artifact
-#     - download: current
-#       artifact: app
-
-#     # Create or update Azure App Service
-#     - task: AzureResourceGroupDeployment@2
-#       displayName: 'Azure Deployment:Create Azure App Service'
-#       inputs:
-#         azureSubscription: '$(subscription)'
-#         resourceGroupName: '$(rgName)'
-#         location: '$(location)'
-#         csmFile: '$(Pipeline.Workspace)/**/container-webapp-template.json'
-#         overrideParameters: '-webAppName "$(webAppName)-stg" -hostingPlanName $(webAppName) -appInsightsLocation "$(location)" -sku "S1 Standard" -registryName $(acrName) -registryLocation "$(location)" -registrySku standard -imageName $(imageName):$(Build.BuildId)'
-
-#     # Deploy App Service
-#     - task: AzureRmWebAppDeployment@3
-#       displayName: 'Deploy Azure App Service'
-#       inputs:
-#         azureSubscription: '$(subscription)'
-#         appType: applinux
-#         WebAppName: "$(webAppName)-stg"
-#         DockerNamespace: $(acrHostName)
-#         DockerRepository: $(webAppName)
-#         DockerImageTag: '$(Build.BuildId)'
-#         WebAppUri: webAppUrl
-#         TakeAppOfflineFlag: true
-#         UseWebDeploy: true
-#         RenameFilesFlag: true
-
-# #PRD release
-# - stage: PRD_Stage
-#   jobs:
-#   - job: Release
-#     pool:
-#       vmImage: 'Ubuntu-latest'
-#     steps:
-#     # Don't clone the repo
-#     - checkout: none
-
-#     # Download the published application artifact
-#     - download: current
-#       artifact: app
-
-#     # Create or update Azure App Service
-#     - task: AzureResourceGroupDeployment@2
-#       displayName: 'Azure Deployment:Create Azure App Service'
-#       inputs:
-#         azureSubscription: '$(subscription)'
-#         resourceGroupName: '$(rgName)'
-#         location: '$(location)'
-#         csmFile: '$(Pipeline.Workspace)/**/container-webapp-template.json'
-#         overrideParameters: '-webAppName "$(webAppName)-prd" -hostingPlanName $(webAppName) -appInsightsLocation "$(location)" -sku "S1 Standard" -registryName $(acrName) -registryLocation "$(location)" -registrySku standard -imageName $(imageName):$(Build.BuildId)'
-
-#     # Deploy App Service
-#     - task: AzureRmWebAppDeployment@3
-#       displayName: 'Deploy Azure App Service'
-#       inputs:
-#         azureSubscription: '$(subscription)'
-#         appType: applinux
-#         WebAppName: "$(webAppName)-prd"
-#         DockerNamespace: $(acrHostName)
-#         DockerRepository: $(webAppName)
-#         DockerImageTag: '$(Build.BuildId)'
-#         WebAppUri: webAppUrl
-#         TakeAppOfflineFlag: true
-#         UseWebDeploy: true
-#         RenameFilesFlag: true
+      - checkout: none
+      - task: AzureCLI@2
+        displayName: 'Deploy Service'
+        inputs:
+          azureSubscription: $(subscription)
+          scriptType: 'bash'
+          scriptLocation: 'inlineScript'
+          inlineScript: |
+            az webapp create -g $(rgname) -p $(appservice.plan) -n $(app.name) -i ananapi.azurecr.io/cape-demo:latest 
+            az webapp config appsettings set -g $(rgname) -n $(app.name) --settings WEBSITES_PORT=8080
+            az webapp start -g $(rgname) -n $(app.name)
+            
 
 # #Destroy Function
 # - stage: DestroyEnvironment
