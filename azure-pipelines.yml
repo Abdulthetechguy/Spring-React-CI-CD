@@ -2,22 +2,17 @@ trigger:
   branches:
     include: 
     - master
-
-pool:
-  vmImage: 'ubuntu-latest'
-
 variables:
-  subscription: 'ADOSC'
-  rgname: 'newtest'
-  app.name: 'myappxd21'
-  appservice.plan: 'myappserviceplanw231'
-  mysql.db.name: springdb
-  mysql.db.server: mysqlv3221
-  mysql.db.username: 'root'
-  location: 'west us'
-  acr.name: 'ananapi'
-  registry.username: 'ananapi'
-  regconnect: 'test'
+  buildConfiguration: 'Release'
+  location: 'West US'
+  acrHostName: 'capex21.azurecr.io'
+  acrName: 'capex21'
+  rgName: 'cape-rg'
+  imageName: 'capex21'
+  webAppName: 'capex2122'
+  subscription: 'last'
+  # webAppNamestg: 'capedockerstg'
+  # webAppNameprd: 'capedockerprd'
 
 stages:
 
@@ -28,22 +23,32 @@ stages:
     pool:
       vmImage: 'Ubuntu-latest'
     steps:
-
-# # Create MySQL Database
-#     - task: AzureResourceGroupDeployment@2
-#       displayName: 'Azure Deployment:Create MySql Database'
-#       inputs:
-#         azureSubscription: '$(subscription)'
-#         resourceGroupName: '$(rgName)'
-#         location: $(location)
-#         csmFile: '$(System.DefaultWorkingDirectory)/**/database-webapp-template.json'
-        
-#Login to ACR
-    - task: Docker@2
-      displayName: Login to ACR
+    
+     # Create or update the ACR resource
+    - task: AzureResourceGroupDeployment@2
+      displayName: 'Azure Deployment:Create Azure Container Registry'
       inputs:
-        command: login
-        containerRegistry: test
+        azureSubscription: '$(subscription)'
+        resourceGroupName: '$(rgName)'
+        location: $(location)
+        csmFile: '$(System.DefaultWorkingDirectory)/**/containerRegistry-template.json'
+        overrideParameters: '-registryName "$(acrName)" -registryLocation "$(location)" -registrySku standard'
+
+# Create MySQL Database
+    - task: AzureResourceGroupDeployment@2
+      displayName: 'Azure Deployment:Create MySql Database'
+      inputs:
+        azureSubscription: '$(subscription)'
+        resourceGroupName: '$(rgName)'
+        location: $(location)
+        csmFile: '$(System.DefaultWorkingDirectory)/**/database-webapp-template.json'
+        
+# #Login to ACR
+#     - task: Docker@2
+#       displayName: Login to ACR
+#       inputs:
+#         command: login
+#         containerRegistry: test
 
 #Build java Artifact
     - task: Maven@3
@@ -57,33 +62,34 @@ stages:
         testResultsFiles: '**/surefire-reports/TEST-*.xml'
         goals: 'package -Dmaven.test.skip=true'
 
-# Build and push image to ACR
-    - task: Docker@2
-      displayName: Build and Push
+# # Build and push image to ACR
+#     - task: Docker@2
+#       displayName: Build and Push
+#       inputs:
+#         command: buildAndPush
+#         repository: cape-demo
+#         tags: latest
+   # Build container image
+    - task: Docker@1
+      displayName: 'Build container image'
       inputs:
-        command: buildAndPush
-        repository: cape-demo
-        tags: latest
+        azureSubscriptionEndpoint: '$(subscription)'
+        azureContainerRegistry: '$(acrHostName)'
+        imageName: '$(imageName):$(Build.BuildId)'
+        useDefaultContext: false
+        buildContext: '$(System.DefaultWorkingDirectory)'
+
+    # Push container image
+    - task: Docker@1
+      displayName: 'Push container image'
+      inputs:
+        azureSubscriptionEndpoint: '$(subscription)'
+        azureContainerRegistry: '$(acrHostName)'
+        command: 'Push an image'
+        imageName: '$(imageName):$(Build.BuildId)'
 
 
-- stage: Deployment 
-  jobs:
-  - job: DeployService
-    displayName: 'Update webapp'
-    steps:
-      - checkout: none
-      - task: AzureCLI@2
-        displayName: 'Deploy Service'
-        inputs:
-          azureSubscription: $(subscription)
-          scriptType: 'bash'
-          scriptLocation: 'inlineScript'
-          inlineScript: |
-            az group create -n $(rgname) -l $(location)
-            az webapp create -g $(rgname) -p $(appservice.plan) -n $(app.name) -i ananapi.azurecr.io/cape-demo:latest 
-            az webapp config appsettings set -g $(rgname) -n $(app.name) --settings WEBSITES_PORT=8080
-            az webapp start -g $(rgname) -n $(app.name)
-            
+
 
 # #Destroy Function
 # - stage: DestroyEnvironment
