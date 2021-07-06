@@ -9,11 +9,13 @@ variables:
   acrName: 'capex21'
   rgName: 'cape-rg'
   imageName: 'capex21'
-  webAppName: 'capex2122'
+  webAppName: 'capex21'
   subscription: 'last'
+  reconnect: 'mylast'
+  tag: 'latest'
+
   # webAppNamestg: 'capedockerstg'
   # webAppNameprd: 'capedockerprd'
-
 stages:
 
 # Build Stage
@@ -23,32 +25,34 @@ stages:
     pool:
       vmImage: 'Ubuntu-latest'
     steps:
-    
-     # Create or update the ACR resource
+
+
+# # Create or update the ACR resource
+#     - task: AzureResourceGroupDeployment@2
+#       displayName: 'Azure Deployment:Create Azure Container Registry'
+#       inputs:
+#         azureSubscription: '$(subscription)'
+#         resourceGroupName: '$(rgName)'
+#         location: $(location)
+#         csmFile: '$(System.DefaultWorkingDirectory)/**/containerRegistry-template.json'
+#         overrideParameters: '-registryName "$(acrName)" -registryLocation "$(location)" -registrySku standard'
+
+# Create MySQL Database
     - task: AzureResourceGroupDeployment@2
       displayName: 'Azure Deployment:Create Azure Container Registry'
       inputs:
         azureSubscription: '$(subscription)'
         resourceGroupName: '$(rgName)'
         location: $(location)
-        csmFile: '$(System.DefaultWorkingDirectory)/**/containerRegistry-template.json'
-        overrideParameters: '-registryName "$(acrName)" -registryLocation "$(location)" -registrySku standard'
-
-# Create MySQL Database
-    - task: AzureResourceGroupDeployment@2
-      displayName: 'Azure Deployment:Create MySql Database'
-      inputs:
-        azureSubscription: '$(subscription)'
-        resourceGroupName: '$(rgName)'
-        location: $(location)
         csmFile: '$(System.DefaultWorkingDirectory)/**/database-webapp-template.json'
         
-# #Login to ACR
-#     - task: Docker@2
-#       displayName: Login to ACR
-#       inputs:
-#         command: login
-#         containerRegistry: test
+
+#Login to ACR
+    - task: Docker@2
+      displayName: Login to ACR
+      inputs:
+        command: login
+        containerRegistry: mylast
 
 #Build java Artifact
     - task: Maven@3
@@ -62,65 +66,61 @@ stages:
         testResultsFiles: '**/surefire-reports/TEST-*.xml'
         goals: 'package -Dmaven.test.skip=true'
 
+# Build and push image to ACR
+    - task: Docker@2
+      displayName: Build and Push
+      inputs:
+        command: buildAndPush
+        repository: cape-demo
+        tags: latest
+
+ # Copy ARM templates
     - task: CopyFiles@2
-      displayName: 'Copy Files to: $(build.artifactstagingdirectory)'
+      displayName: 'Copy ARM templates'
       inputs:
-        SourceFolder: '$(system.defaultworkingdirectory)'
-        Contents: '**/*.jar'
+        SourceFolder: ArmTemplates
         TargetFolder: '$(build.artifactstagingdirectory)'
-      condition: succeededOrFailed()
+
+    # Publish the app as an artifact
+    - publish: $(Build.StagingDirectory)
+      artifact: app
 
 
-    - task: PublishBuildArtifacts@1
-      displayName: 'Publish Artifact: drop'
+# Dev release
+- stage: DEV_Stage
+  jobs:
+  - job: Release
+    pool:
+      vmImage: 'Ubuntu-latest'
+    steps:
+    # Don't clone the repo
+    - checkout: none
+
+    # Download the published application artifact
+    - download: current
+      artifact: app
+
+    # Create or update Azure App Service
+    - task: AzureResourceGroupDeployment@2
+      displayName: 'Azure Deployment:Create Azure App Service'
       inputs:
-        PathtoPublish: '$(build.artifactstagingdirectory)'
-        ArtifactName: 'drop'
-      condition: succeededOrFailed()  
-# # Build and push image to ACR
-#     - task: Docker@2
-#       displayName: Build and Push
-#       inputs:
-#         command: buildAndPush
-#         repository: cape-demo
-#         tags: latest
-   # Build container image
-    - task: Docker@1
-      displayName: 'Build container image'
+        azureSubscription: '$(subscription)'
+        resourceGroupName: '$(rgName)'
+        location: '$(location)'
+        csmFile: '$(Pipeline.Workspace)/**/container1-webapp-template.json'
+        overrideParameters: '-webAppName "$(webAppName)-dev" -hostingPlanName $(webAppName) -appInsightsLocation "$(location)" -sku "S1 Standard" -registryName $(acrName) -registryLocation "$(location)" -registrySku standard -imageName $(imageName):$(latest)'
+
+    # Deploy App Service
+    - task: AzureRmWebAppDeployment@3
+      displayName: 'Deploy Azure App Service'
       inputs:
-        azureSubscriptionEndpoint: '$(subscription)'
-        azureContainerRegistry: '$(acrHostName)'
-        imageName: '$(imageName):$(Build.BuildId)'
-        useDefaultContext: false
-        dockerFile: 'react-and-spring-data-rest/Dockerfile'
-        buildContext: '$(System.DefaultWorkingDirectory)'
-
-    # Push container image
-    - task: Docker@1
-      displayName: 'Push container image'
-      inputs:
-        azureSubscriptionEndpoint: '$(subscription)'
-        azureContainerRegistry: '$(acrHostName)'
-        command: 'Push an image'
-        imageName: '$(imageName):$(Build.BuildId)'
-
-
-
-
-# #Destroy Function
-# - stage: DestroyEnvironment
-#   jobs:
-#   - deployment: DestroyAll
-#     environment: 'Destroy'
-#     strategy:
-#      runOnce:
-#        deploy:
-#          steps:
-#           - task: AzureCLI@2
-#             inputs:
-#               azureSubscription: '$(subscription)'
-#               scriptType: 'pscore'
-#               scriptLocation: 'inlineScript'
-#               inlineScript: 'az group delete --name $(rgName) --yes'
-#               powerShellErrorActionPreference: 'silentlyContinue'
-         
+        azureSubscription: '$(subscription)'
+        appType: applinux
+        WebAppName: "$(webAppName)-dev"
+        DockerNamespace: $(acrHostName)
+        DockerRepository: $(webAppName)
+        DockerImageTag: '$(latest)'
+        WebAppUri: webAppUrl
+        TakeAppOfflineFlag: true
+        UseWebDeploy: true
+        RenameFilesFlag: true
