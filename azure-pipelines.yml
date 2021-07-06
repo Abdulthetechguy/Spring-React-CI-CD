@@ -77,6 +77,7 @@ stages:
         azureContainerRegistry: '$(acrHostName)'
         imageName: '$(imageName):$(Build.BuildId)'
         useDefaultContext: false
+        dockerFile: 'react-and-spring-data-rest/Dockerfile'
         buildContext: '$(System.DefaultWorkingDirectory)'
 
     # Push container image
