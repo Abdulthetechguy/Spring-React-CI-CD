@@ -11,11 +11,10 @@ variables:
   imageName: 'capex21'
   webAppName: 'capex21'
   subscription: 'last'
-  reconnect: 'mylast'
+  RegistryConnect: 'mylast'
   tag: 'latest'
 
-  # webAppNamestg: 'capedockerstg'
-  # webAppNameprd: 'capedockerprd'
+  
 stages:
 
 # Build Stage
@@ -44,7 +43,7 @@ stages:
         azureSubscription: '$(subscription)'
         resourceGroupName: '$(rgName)'
         location: $(location)
-        csmFile: '$(System.DefaultWorkingDirectory)/**/database-webapp-template.json'
+        csmFile: '$(System.DefaultWorkingDirectory)/**/azure-mysql-template.json'
         
 
 #Login to ACR
@@ -52,7 +51,7 @@ stages:
       displayName: Login to ACR
       inputs:
         command: login
-        containerRegistry: mylast
+        containerRegistry: '$(RegistryConnect)'
 
 #Build java Artifact
     - task: Maven@3
@@ -72,7 +71,7 @@ stages:
       inputs:
         command: buildAndPush
         repository: cape-demo
-        tags: latest
+        tags: '$(tag)'
 
  # Copy ARM templates
     - task: CopyFiles@2
@@ -107,7 +106,7 @@ stages:
         azureSubscription: '$(subscription)'
         resourceGroupName: '$(rgName)'
         location: '$(location)'
-        csmFile: '$(Pipeline.Workspace)/**/container1-webapp-template.json'
+        csmFile: '$(Pipeline.Workspace)/**/linux-container-webapp-template.json'
         overrideParameters: '-webAppName "$(webAppName)-dev" -hostingPlanName $(webAppName) -appInsightsLocation "$(location)" -sku "S1 Standard" -registryName $(acrName) -registryLocation "$(location)" -registrySku standard -imageName $(imageName):$(tag)'
 
     # Deploy App Service
@@ -147,7 +146,7 @@ stages:
         azureSubscription: '$(subscription)'
         resourceGroupName: '$(rgName)'
         location: '$(location)'
-        csmFile: '$(Pipeline.Workspace)/**/container1-webapp-template.json'
+        csmFile: '$(Pipeline.Workspace)/**/linux-container-webapp-template.json'
         overrideParameters: '-webAppName "$(webAppName)-stg" -hostingPlanName $(webAppName) -appInsightsLocation "$(location)" -sku "S1 Standard" -registryName $(acrName) -registryLocation "$(location)" -registrySku standard -imageName $(imageName):$(tag)'
 
     # Deploy App Service
@@ -186,7 +185,7 @@ stages:
         azureSubscription: '$(subscription)'
         resourceGroupName: '$(rgName)'
         location: '$(location)'
-        csmFile: '$(Pipeline.Workspace)/**/container1-webapp-template.json'
+        csmFile: '$(Pipeline.Workspace)/**/linux-container-webapp-template.json'
         overrideParameters: '-webAppName "$(webAppName)-prd" -hostingPlanName $(webAppName) -appInsightsLocation "$(location)" -sku "S1 Standard" -registryName $(acrName) -registryLocation "$(location)" -registrySku standard -imageName $(imageName):$(tag)'
 
     # Deploy App Service

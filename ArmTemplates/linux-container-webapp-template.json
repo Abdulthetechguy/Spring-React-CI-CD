@@ -3,34 +3,26 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "webAppName": {
-            "type": "String",
-            "defaultValue": "westweb223v"
+            "type": "String"
         },
         "hostingPlanName": {
-            "type": "String",
-            "defaultValue": "westweb223vplan"
+            "type": "String"
         },
         "appInsightsLocation": {
-            "type": "String",
-            "defaultValue": "West US 2"
+            "type": "String"
         },
         "sku": {
-            "defaultValue": "S1 Standard",
+            "defaultValue": "Standard",
             "type": "String"
         },
         "registryName": {
-            "type": "String",
-            "defaultValue": "capehakeemww0azacr2"
+            "type": "String"
         },
         "imageName": {
-            "type":"String",
-            "defaultValue": ""
-
+            "type":"String"
         },
         "registryLocation": {
-            "type": "String",
-            "defaultValue": "West US 2"
-
+            "type": "String"
         },
         "registrySku": {
             "defaultValue": "Standard",
@@ -104,15 +96,15 @@
             "type": "String"
         }
     },
-      "variables": {
-    "settingName": "[concat(toLower(parameters('hostingPlanName')), '-setting')]",
-    "targetResourceId": "[resourceId('Microsoft.Web/serverFarms/', parameters('hostingPlanName'))]"
-  },
+    "variables": {
+        "settingName": "[concat(toLower(parameters('hostingPlanName')), '-setting')]",
+        "targetResourceId": "[resourceId('Microsoft.Web/serverFarms/', parameters('hostingPlanName'))]" 
+    },
     "resources": [
         {
             "type": "Microsoft.Web/sites",
             "name": "[parameters('webAppName')]",
-            "apiVersion": "2016-08-01",
+            "apiVersion": "2016-03-01",
             "location": "[resourceGroup().location]",
             "tags": {
                 "[concat('hidden-related:', '/subscriptions/', subscription().subscriptionId,'/resourcegroups/', resourceGroup().name, '/providers/Microsoft.Web/serverfarms/', parameters('hostingPlanName'))]": "empty"
@@ -162,7 +154,7 @@
             "apiVersion": "2017-10-01",
             "location": "[parameters('registryLocation')]",
             "properties": {
-                "adminUserEnabled": true
+                "adminUserEnabled": "true"
             }
         },
         {
@@ -181,7 +173,6 @@
                 "reserved": true,
                 "numberOfWorkers": "1",
                 "hostingEnvironment": ""
-                
             }
         },
         {
@@ -197,7 +188,7 @@
                 "Request_Source": "AzureTfsExtensionAzureProject"
             }
         },
-           {
+         {
         "type": "Microsoft.Insights/autoscalesettings",
         "name": "[variables('settingName')]",
         "dependsOn": [
