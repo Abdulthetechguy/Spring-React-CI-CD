@@ -62,6 +62,21 @@ stages:
         testResultsFiles: '**/surefire-reports/TEST-*.xml'
         goals: 'package -Dmaven.test.skip=true'
 
+    - task: CopyFiles@2
+      displayName: 'Copy Files to: $(build.artifactstagingdirectory)'
+      inputs:
+        SourceFolder: '$(system.defaultworkingdirectory)'
+        Contents: '**/*.jar'
+        TargetFolder: '$(build.artifactstagingdirectory)'
+      condition: succeededOrFailed()
+
+
+    - task: PublishBuildArtifacts@1
+      displayName: 'Publish Artifact: drop'
+      inputs:
+        PathtoPublish: '$(build.artifactstagingdirectory)'
+        ArtifactName: 'drop'
+      condition: succeededOrFailed()  
 # # Build and push image to ACR
 #     - task: Docker@2
 #       displayName: Build and Push
