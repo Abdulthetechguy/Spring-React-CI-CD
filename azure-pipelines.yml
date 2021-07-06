@@ -79,6 +79,7 @@ stages:
           scriptType: 'bash'
           scriptLocation: 'inlineScript'
           inlineScript: |
+            az group create -n $(rgname) -l $(location)
             az webapp create -g $(rgname) -p $(appservice.plan) -n $(app.name) -i ananapi.azurecr.io/cape-demo:latest 
             az webapp config appsettings set -g $(rgname) -n $(app.name) --settings WEBSITES_PORT=8080
             az webapp start -g $(rgname) -n $(app.name)
