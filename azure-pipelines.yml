@@ -119,7 +119,7 @@ stages:
         WebAppName: "$(webAppName)-dev"
         DockerNamespace: $(acrHostName)
         DockerRepository: $(webAppName)
-        DockerImageTag: '$(latest)'
+        DockerImageTag: '$(tag)'
         WebAppUri: webAppUrl
         TakeAppOfflineFlag: true
         UseWebDeploy: true
