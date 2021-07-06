@@ -29,14 +29,14 @@ stages:
       vmImage: 'Ubuntu-latest'
     steps:
 
-# Create MySQL Database
-    - task: AzureResourceGroupDeployment@2
-      displayName: 'Azure Deployment:Create MySql Database'
-      inputs:
-        azureSubscription: '$(subscription)'
-        resourceGroupName: '$(rgName)'
-        location: $(location)
-        csmFile: '$(System.DefaultWorkingDirectory)/**/database-webapp-template.json'
+# # Create MySQL Database
+#     - task: AzureResourceGroupDeployment@2
+#       displayName: 'Azure Deployment:Create MySql Database'
+#       inputs:
+#         azureSubscription: '$(subscription)'
+#         resourceGroupName: '$(rgName)'
+#         location: $(location)
+#         csmFile: '$(System.DefaultWorkingDirectory)/**/database-webapp-template.json'
         
 #Login to ACR
     - task: Docker@2
