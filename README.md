@@ -110,6 +110,7 @@ Repeat the same step to create a service connection for ACR:
 First fork the [repo](https://github.com/Abdulthetechguy/Springdemo) by clicking on the fork icon on the top right
 
 ![forkrepo](assets/repofork.png)
+ 
 Navigate to your DevOps project and Create a pipeline by clicking on the Pipeline icon
 
 ![createpipeline](assets/pipelinecreate.png)
