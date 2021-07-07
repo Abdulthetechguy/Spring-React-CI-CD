@@ -42,9 +42,16 @@ Leveraging Azure Active Directory for authentication and authorization. With thi
 8. There is a destroy stage (Using pipeline approval). Click on it to review and approve to destroy the whole infrastructure built
  # Prerequisite:
 **Azure DevOps account:** we will use an Azure DevOps project with a Github repo and build/release pipelines. Create your free account and a new project [here](https://azure.microsoft.com/services/devops/).
+
+
 **Azure Subscription:** An azure subscription is needed to provision the Azure services for this demonstration. If you don’t have one, you can get a free trial one [here](https://azure.microsoft.com/free/). Create an azure DevOps project
+
+
 **Bash Shell:** we will leverage Azure Cloud Shell. Once your Azure Subscription is set up you can enable and use your associated [Azure Cloud Shell](https://docs.microsoft.com/azure/cloud-shell/overview) session. Notes: you could use any local bash terminal. Make sure you have [installed the Azure CLI](https://docs.microsoft.com/cli/azure/install-azure-cli)
+
 **Container registry:** we will use Azure Container Registry (ACR) to store our Docker images. Run the command below to create an ACR
+
+
 **Service Principal:** we will leverage SPN with contributor access to create resources on Azure from Azure DevOps
 
   
