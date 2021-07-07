@@ -7,7 +7,7 @@ variables:
   location: 'West US' #Change this to your RG location
   acrHostName: 'capex21.azurecr.io' #Change this to your ACR Host Name
   acrName: 'capex21'
-  rgName: 'cape-rg' # Chnage this to your RG
+  rgName: 'cape1-rg' # Chnage this to your RG
   imageName: 'capex21'
   webAppName: 'capex21'
   subscription: 'last' #Update this ARM service connection Created
@@ -15,7 +15,7 @@ variables:
   tag: 'latest'
   dbserver: 'springdb2021'
   dbusername: 'mysqladmin'
-  dbpassword: 'MyLongPassword2021' #Minimum 8 character Long
+  dbpassword: '$(dbpassword)' #Minimum 8 character Long
 
 
 stages:
