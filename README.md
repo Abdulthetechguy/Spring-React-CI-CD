@@ -13,13 +13,13 @@ I chose AppService because it has Linux Container webapp offering that can host 
 
 There is also a mysql deployed for the database
 # Infrastructure Component
-**Monitoring and Auditing**
+## Monitoring and Auditing
 The AppService is integrated with Azure Application Insight for monitoring. It collects different metrics such us request rate, response time, failure rate etc. It could also detect anomalies within the application. Auditing is done using the Activity Log.
 
-**AutoScaling**
+## AutoScaling
 I am using Standard AppService Tier which could scale up to 10 instances. Its has been configured to scale based on CPU metric. When the CPU consumption hit 70% it scales up automatically and scale down when it goes below 30%
 
-**Authentication**
+## Authentication
 Leveraging Azure Active Directory for authentication and authorization. With this, multiple users can be invited to login with their personal accounts and permission to resources can be granted.
 
 # How to deploy the application on your environment
