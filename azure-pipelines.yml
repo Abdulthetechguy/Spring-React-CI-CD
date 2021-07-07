@@ -11,7 +11,7 @@ variables:
   imageName: 'capex21'
   webAppName: 'capex21'
   subscription: 'ADSOC' #Update this ARM service connection Created
-  RegistryConnect: 'mylast' #Update this to the Docker Registry connection Created
+  RegistryConnect: 'hello' #Update this to the Docker Registry connection Created
   tag: 'latest'
   dbserver: 'springdb2021'
   dbusername: 'mysqladmin'
