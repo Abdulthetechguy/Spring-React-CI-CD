@@ -90,20 +90,20 @@ Create a service connection for ACR and for the pipeline using the details of th
 
 **Fill the following details:**
 
--**Subscription ID:** < Your  Subscription  ID>
--**Subscription Name:** < subscription  name>
--**Service principal id:**  < Service  principal  Id>
--**Service principal Key:** < Service  Principal  Key>
--**Tenant ID :** < Your  Tenant  ID>
--**Service Connection Name:**  <Service  connection  Name> This will be referenced in the YAML pipeline
-**Click on save and verify**
+- **Subscription ID:** < Your  Subscription  ID>
+- **Subscription Name:** < subscription  name>
+- **Service principal id:**  < Service  principal  Id>
+- **Service principal Key:** < Service  Principal  Key>
+- **Tenant ID :** < Your  Tenant  ID>
+- **Service Connection Name:**  <Service  connection  Name> This will be referenced in the YAML pipeline
+- **Click on save and verify**
 
 Repeat the same step to create a service connection for ACR:
--Click on service Connection
--Click on Docker Registry 
--Select Azure Container Registry.
--Select your prefered subscription 
--Give a connection name. This will later be referenced in the YAML pipeline to connect to the registry
+- Click on service Connection
+- Click on Docker Registry 
+- Select Azure Container Registry.
+- Select your prefered subscription 
+- Give a connection name. This will later be referenced in the YAML pipeline to connect to the registry
 
 ## Create a multi Stage pipeline with Yaml
 
