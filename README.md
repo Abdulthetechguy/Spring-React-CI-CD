@@ -134,7 +134,7 @@ Login to Github and authorize it for Azure DevOps. Select the forked repo and it
 
 ## Application HomePage
 
- ![buildstages](assets/website.jpeg)
+ ![buildstages](assets/website.png)
  
 
 
