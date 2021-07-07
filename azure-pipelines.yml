@@ -2,17 +2,20 @@ trigger:
   branches:
     include: 
     - main
-variables:
+variables: 
   buildConfiguration: 'Release'
-  location: 'West US'
-  acrHostName: 'capex21.azurecr.io'
+  location: 'West US' #Change this to your RG location
+  acrHostName: 'capex21.azurecr.io' #Change this to your ACR Host Name
   acrName: 'capex21'
-  rgName: 'cape-rg'
+  rgName: 'cape-rg' # Chnage this to your RG
   imageName: 'capex21'
   webAppName: 'capex21'
-  subscription: 'last'
-  RegistryConnect: 'mylast'
+  subscription: 'last' #Update this ARM service connection Created
+  RegistryConnect: 'mylast' #Update this to the Docker Registry connection Created
   tag: 'latest'
+  dbserver: 'springdb2021'
+  dbusername: 'mysqladmin'
+  dbpassword: 'MyLongPassword2021' #Minimum 8 character Long
 
 
 stages:
@@ -44,6 +47,9 @@ stages:
         resourceGroupName: '$(rgName)'
         location: $(location)
         csmFile: '$(System.DefaultWorkingDirectory)/**/azure-mysql-template.json'
+        overrideParameters: '-serverName "$(dbserver)" -administratorLogin "$(dbusername)" -administratorLoginPassword "$(dbpassword)"'
+
+     
         
 
 #Login to ACR
@@ -55,6 +61,7 @@ stages:
 
 #Build java Artifact
     - task: Maven@3
+      displayName: Maven Build  
       inputs:
         mavenPomFile: 'react-and-spring-data-rest/pom.xml'
         mavenOptions: '-Xmx3072m'
@@ -70,7 +77,7 @@ stages:
       displayName: Build and Push
       inputs:
         command: buildAndPush
-        repository: cape-demo
+        repository: '$(imageName)'
         tags: '$(tag)'
 
  # Copy ARM templates
@@ -86,7 +93,8 @@ stages:
 
 
 # Dev release
-- stage: DEV_Stage
+- stage: DEV
+  displayName: Release to DEV 
   jobs:
   - job: Release
     pool:
@@ -101,7 +109,7 @@ stages:
 
     # Create or update Azure App Service
     - task: AzureResourceGroupDeployment@2
-      displayName: 'Azure Deployment:Create Azure App Service'
+      displayName: 'Azure Deployment:Create DEV Azure App Service'
       inputs:
         azureSubscription: '$(subscription)'
         resourceGroupName: '$(rgName)'
@@ -111,7 +119,7 @@ stages:
 
     # Deploy App Service
     - task: AzureRmWebAppDeployment@3
-      displayName: 'Deploy Azure App Service'
+      displayName: 'Deploy Azure App Service to Dev'
       inputs:
         azureSubscription: '$(subscription)'
         appType: applinux
@@ -126,7 +134,8 @@ stages:
 
 
 #Staging release
-- stage: STG_Release
+- stage: STG
+  displayName: Release to STG 
   jobs:
   - job: Release
     pool:
@@ -141,7 +150,7 @@ stages:
 
     # Create or update Azure App Service
     - task: AzureResourceGroupDeployment@2
-      displayName: 'Azure Deployment:Create Azure App Service'
+      displayName: 'Azure Deployment:Create STG Azure App Service'
       inputs:
         azureSubscription: '$(subscription)'
         resourceGroupName: '$(rgName)'
@@ -151,7 +160,7 @@ stages:
 
     # Deploy App Service
     - task: AzureRmWebAppDeployment@3
-      displayName: 'Deploy Azure App Service'
+      displayName: 'Deploy Azure App Service to STG'
       inputs:
         azureSubscription: '$(subscription)'
         appType: applinux
@@ -165,7 +174,8 @@ stages:
         RenameFilesFlag: true
 
 #PRD release
-- stage: PRD_Stage
+- stage: PRD
+  displayName: Release to PRD
   jobs:
   - job: Release
     pool:
@@ -180,7 +190,7 @@ stages:
 
     # Create or update Azure App Service
     - task: AzureResourceGroupDeployment@2
-      displayName: 'Azure Deployment:Create Azure App Service'
+      displayName: 'Azure Deployment:Create PRD Azure App Service'
       inputs:
         azureSubscription: '$(subscription)'
         resourceGroupName: '$(rgName)'
@@ -190,7 +200,7 @@ stages:
 
     # Deploy App Service
     - task: AzureRmWebAppDeployment@3
-      displayName: 'Deploy Azure App Service'
+      displayName: 'Deploy Azure App Service to PRD'
       inputs:
         azureSubscription: '$(subscription)'
         appType: applinux
@@ -203,8 +213,9 @@ stages:
         UseWebDeploy: true
         RenameFilesFlag: true
 
-#Destroy Function
+#Destroy Infra
 - stage: DestroyEnvironment
+  displayName: Destroy Infrastructure
   jobs:
   - deployment: DestroyAll
     environment: 'Destroy'

@@ -3,12 +3,12 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "registryName": {
-            "type": "String",
-            "defaultValue": "capehakeemww0azacr2"
+            "type": "String"
+            
         },
         "registryLocation": {
             "type": "String",
-            "defaultValue": "West US 2"
+            "defaultValue": "West US"
         },
         "registrySku": {
             "defaultValue": "Standard",
