@@ -127,9 +127,16 @@ Login to Github and authorize it for Azure DevOps. Select the forked repo and it
 
   
 
-**See a complete build below:**
+**See a complete build and release below:**
 
 ![buildstages](assets/completebuild.jpeg)
+ 
+
+## Application HomePage
+
+ ![buildstages](assets/website.jpeg)
+ 
+
 
   
 
