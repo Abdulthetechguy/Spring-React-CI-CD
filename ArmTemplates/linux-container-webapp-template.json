@@ -154,7 +154,7 @@
             "apiVersion": "2017-10-01",
             "location": "[parameters('registryLocation')]",
             "properties": {
-                "adminUserEnabled": "true"
+                "adminUserEnabled": true
             }
         },
         {
