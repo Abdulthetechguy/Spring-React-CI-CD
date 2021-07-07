@@ -41,18 +41,18 @@ Leveraging Azure Active Directory for authentication and authorization. With thi
 
 8. There is a destroy stage (Using pipeline approval). Click on it to review and approve to destroy the whole infrastructure built
  # Prerequisite:
-**Azure DevOps account:** we will use an Azure DevOps project with a Github repo and build/release pipelines. Create your free account and a new project [here](https://azure.microsoft.com/services/devops/).
+- **Azure DevOps account:** we will use an Azure DevOps project with a Github repo and build/release pipelines. Create your free account and a new project [here](https://azure.microsoft.com/services/devops/).
 
 
-**Azure Subscription:** An azure subscription is needed to provision the Azure services for this demonstration. If you don’t have one, you can get a free trial one [here](https://azure.microsoft.com/free/). Create an azure DevOps project
+- **Azure Subscription:** An azure subscription is needed to provision the Azure services for this demonstration. If you don’t have one, you can get a free trial one [here](https://azure.microsoft.com/free/). Create an azure DevOps project
 
 
-**Bash Shell:** we will leverage Azure Cloud Shell. Once your Azure Subscription is set up you can enable and use your associated [Azure Cloud Shell](https://docs.microsoft.com/azure/cloud-shell/overview) session. Notes: you could use any local bash terminal. Make sure you have [installed the Azure CLI](https://docs.microsoft.com/cli/azure/install-azure-cli)
+- **Bash Shell:** we will leverage Azure Cloud Shell. Once your Azure Subscription is set up you can enable and use your associated [Azure Cloud Shell](https://docs.microsoft.com/azure/cloud-shell/overview) session. Notes: you could use any local bash terminal. Make sure you have [installed the Azure CLI](https://docs.microsoft.com/cli/azure/install-azure-cli)
 
-**Container registry:** we will use Azure Container Registry (ACR) to store our Docker images. Run the command below to create an ACR
+- **Container registry:** we will use Azure Container Registry (ACR) to store our Docker images. Run the command below to create an ACR
 
 
-**Service Principal:** we will leverage SPN with contributor access to create resources on Azure from Azure DevOps
+- **Service Principal:** we will leverage SPN with contributor access to create resources on Azure from Azure DevOps
 
   
 
@@ -90,20 +90,20 @@ Create a service connection for ACR and for the pipeline using the details of th
 
 **Fill the following details:**
 
-**Subscription ID:** < Your  Subscription  ID>
-**Subscription Name:** < subscription  name>
-**Service principal id:**  < Service  principal  Id>
-**Service principal Key:** < Service  Principal  Key>
-**Tenant ID :** < Your  Tenant  ID>
-**Service Connection Name:**  <Service  connection  Name> This will be referenced in the YAML pipeline
+-**Subscription ID:** < Your  Subscription  ID>
+-**Subscription Name:** < subscription  name>
+-**Service principal id:**  < Service  principal  Id>
+-**Service principal Key:** < Service  Principal  Key>
+-**Tenant ID :** < Your  Tenant  ID>
+-**Service Connection Name:**  <Service  connection  Name> This will be referenced in the YAML pipeline
 **Click on save and verify**
 
 Repeat the same step to create a service connection for ACR:
-Click on service Connection
-Click on Docker Registry 
-Select Azure Container Registry.
-Select your prefered subscription 
-Give a connection name. This will later be referenced in the YAML pipeline to connect to the registry
+-Click on service Connection
+-Click on Docker Registry 
+-Select Azure Container Registry.
+-Select your prefered subscription 
+-Give a connection name. This will later be referenced in the YAML pipeline to connect to the registry
 
 ## Create a multi Stage pipeline with Yaml
 
